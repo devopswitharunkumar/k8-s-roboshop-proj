@@ -1,0 +1,44 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: mongodb-ds
+  namespace: roboshop
+  labels:
+    app: mongodb      #this labels are deployment labels any thing we can give
+    project: roboshop
+    tier: db 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb    #this labels should match the pod labels it is used to find the pods
+      project: roboshop
+      tier: db 
+  template:
+    metadata:
+      labels:
+        app: mongodb    #this are pod labels
+        project: roboshop
+        tier: db 
+    spec:
+      containers:
+      - name: mongodb
+        image: narupallearun/mongodb:v1
+        imagePullPolicy: Always 
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: roboshop
+spec:
+  selector:
+    app: mongodb
+    project: roboshop
+    tier: db 
+  ports:
+  - protocol: TCP
+    port: 27017     #service port 
+    targetPort: 27017   #container port no
+
+
