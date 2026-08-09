@@ -31,7 +31,7 @@ kind: Service
 metadata:
   name: mongodb-service
   namespace: roboshop
-spec:
+spec:       #if we dont mention type it will automatically by default ClusterIP
   selector:
     app: mongodb
     project: roboshop
