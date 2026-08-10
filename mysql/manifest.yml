@@ -1,0 +1,71 @@
+apiVersion: v1 
+kind: ConfigMap 
+metadata:
+  name: mysql-config
+  namespace: roboshop
+data: 
+  MYSQL_DATABASE: "cities"
+---
+
+apiVersion: v1 
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: roboshop
+type: Opaque
+data: 
+  MYSQL_ROOT_PASSWORD: Um9ib1Nob3BAMQ==
+  MYSQL_USER: c2hpcHBpbmc=
+  MYSQL_PASSWORD: Um9ib1Nob3BAMQ==
+
+
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: mysql-ds
+  namespace: roboshop
+  labels:
+    app: mysql      #this labels are deployment labels any thing we can give
+    project: roboshop
+    tier: db 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql    #this labels should match the pod labels it is used to find the pods
+      project: roboshop
+      tier: db 
+  template:
+    metadata:
+      labels:
+        app: mysql    #this are pod labels
+        project: roboshop
+        tier: db 
+    spec:
+      containers:
+      - name: mysql
+        image: narupallearun/mysql:v1
+        imagePullPolicy: Always 
+        envFrom:
+        - configMapRef:
+            name: mysql-config
+        - secretRef:
+            name: mysql-secret
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: roboshop
+spec:       #if we dont mention type it will automatically by default ClusterIP
+  selector:
+    app: mysql
+    project: roboshop
+    tier: db 
+  ports:
+  - protocol: TCP
+    port: 3306     #service port 
+    targetPort: 3306   #container port no
+
+
